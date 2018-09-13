@@ -96,7 +96,9 @@ class TicketInputController extends Controller
     // Получить список подъездов, в которых есть лифты
     public function actionGetEntranceWithElevators($FacilityId = 0, $ObjectId = '000')
     {
-        return TicketInputForm::getEntranceWithElevators($FacilityId, $ObjectId);
+        $devtype = 1;
+        if ('002' == $ObjectId) $devtype=10;
+        return TicketInputForm::getEntranceWithElevators($FacilityId, $devtype);
     }
 
     // Получить список лифтов в доме в конкретном подъезде
@@ -109,10 +111,10 @@ class TicketInputController extends Controller
                 $FacilityId =  0 + $data['FacilityId'];
                 $EntranceId = 0 +  $data['EntranceId'];
                 $ObjectId = $data['ObjectId'];
-                if ('001'==$ObjectId)
-                  $res = json_encode(TicketInputForm::getElevatorsList($FacilityId, $EntranceId));
-                else
+                if ('002'==$ObjectId)
                   $res = json_encode(TicketInputForm::getSwichboardList($FacilityId, $EntranceId));
+                else
+                  $res = json_encode(TicketInputForm::getElevatorsList($FacilityId, $EntranceId));
             }
         }
         return $res;

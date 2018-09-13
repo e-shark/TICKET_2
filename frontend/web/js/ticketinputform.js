@@ -38,6 +38,7 @@ function onSelectObject() {
          success: function(data) {
               $("#divProblemSelect").html(data);
               onSelectProblem();
+              onSelectFacility();
          },
          error:   function() {
               $("#divProblemSelect").html('AJAX error!');

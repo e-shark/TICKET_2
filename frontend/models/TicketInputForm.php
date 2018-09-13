@@ -104,9 +104,9 @@ class TicketInputForm extends Model
 	}
 
 	// Получить список подъездов с лифтами
-	public static function getEntranceWithElevators( $FacilityId = 0, $ObjectId = '000')
+	public static function getEntranceWithElevators( $FacilityId = 0, $DeviceType = 1)
 	{
-   		$Sel =  Yii::$app->db->createCommand('SELECT  elporchno as id, elporchno as text FROM elevator e left join ticketobject o on e.eldevicetype = o.tiobjectdevicetype WHERE elfacility_id = :fid and o.tiobjectcode = :objid group by elporchno;')->bindValues([':fid'=>$FacilityId, ':objid'=>$ObjectId])->queryAll();		
+   		$Sel =  Yii::$app->db->createCommand('SELECT  elporchno as id, elporchno as text FROM elevator e WHERE elfacility_id = :fid and e.eldevicetype = :devtype group by elporchno;')->bindValues([':fid'=>$FacilityId, ':devtype'=>$DeviceType])->queryAll();		
    		$cnt = count($Sel);
    		if ($cnt > 0){
    			if (1 == $cnt){
