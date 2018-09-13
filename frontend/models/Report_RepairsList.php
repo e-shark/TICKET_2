@@ -182,23 +182,46 @@ class Report_RepairsList extends Model
 */
 
 		$sqltext="SELECT ticket.id, ticket.tiaddress, ticket.tiobjectcode, tiequipment_id, ticode, tiregion, tiopenedtime, tioosbegin, tioosend, tiplannedtimenew,  oostypetext, tiproblemtypetext, tidescription, tiproblemtext, streetname, fabuildingno, elporchno, elporchpos, elinventoryno 
-		from ticket left join (
-	SELECT e2.elnum, e2.worknum, p.*  FROM (SELECT a.sid, COUNT(a.sid) elnum, SUM(a.st) worknum
-   FROM (SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.tiopstatus st, e.* FROM elevator e  INNER JOIN 
-       (SELECT t.tiequipment_id, t.tiopstatus, MAX(t.tistatustime) lasttime, t.tifacility_id
-           FROM ticket t WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1)
-                GROUP BY t.tiequipment_id) s ON e.id = s.tiequipment_id) a GROUP BY a.sid) e2 INNER JOIN
-                 (SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.lasttime, s.tiopstatus st, e.*
-                    FROM elevator e INNER JOIN (SELECT t.tiequipment_id, t.tiopstatus,
-             MAX(t.tistatustime) lasttime, t.tifacility_id 
-             FROM ticket t WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1)
-             GROUP BY t.tiequipment_id) s ON e.id = s.tiequipment_id) p ON  p.sid = e2.sid
+		FROM ticket LEFT JOIN (
+
+			SELECT e2.elnum, e2.worknum, p.*
+			FROM (	SELECT a.sid, COUNT(a.sid) elnum, SUM(a.st) worknum
+					FROM (	SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.tiopstatus st, e.*
+							FROM elevator e
+							INNER JOIN (	SELECT t.tiequipment_id, t.tiopstatus, a.lasttime, t.tifacility_id 
+											FROM ticket t, (	SELECT t.tiequipment_id tid,  MAX(t.tistatustime) lasttime 
+																FROM ticket t 
+																WHERE t.tiequipment_id IN (	SELECT id FROM elevator WHERE eldevicetype = 1) 
+																GROUP BY tid
+															) a
+											WHERE t.tistatustime = a.lasttime AND t.tiequipment_id = a.tid
+										) s 
+							ON e.id = s.tiequipment_id
+						) a 
+							GROUP BY a.sid
+				) e2
+			INNER JOIN (	SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.lasttime, s.tiopstatus st, e.*
+							FROM elevator e 
+							INNER JOIN (	SELECT t.tiequipment_id, t.tiopstatus, a.lasttime, t.tifacility_id 
+											FROM ticket t, (	SELECT t.tiequipment_id tid,  MAX(t.tistatustime) lasttime 
+																FROM ticket t 
+																WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1) 
+																GROUP BY tid
+															) a 
+											WHERE t.tistatustime = a.lasttime AND t.tiequipment_id = a.tid
+										) s 
+							ON e.id = s.tiequipment_id
+						) p 
+			ON  p.sid = e2.sid 
+			ORDER BY p.id
+
 		) el on ticket.tiequipment_id=el.id
  		left join ticketproblemtype on ticket.tiproblemtype_id =ticketproblemtype.id 
  		left join oostype on ticket.tioostype_id=oostype.id
  		left join facility on ticket.tifacility_id =facility.id 
  		left join street on facility.fastreet_id =street.id
- 		where tiequipment_id is not null $filter order by tiregion, tiequipment_id, tioosbegin ";
+ 		WHERE tiequipment_id is not null $filter 
+ 		ORDER BY tiregion, tiequipment_id, tioosbegin ";
 
 //Yii::warning("\n---------------------------------SQL------------------\n".$sqltext.'\n');
 
@@ -245,7 +268,7 @@ class Report_RepairsList extends Model
 			$intervals[$ibegin] = +1;
 			while( isset($intervals[$iend]) ) $iend++;
 			$intervals[$iend] =  -1;
-	Yii::warning("\n--- int ext ---------------------------------------\n [".$ticket['tioosbegin']."]: ".date('d-m-Y H:i:s',$ibegin)."  = ".$ibegin." \n [".$ticket['tioosend']."]: ".date('d-m-Y H:i:s',$iend)."  = ".$iend."\n  eq_id:".$ticket['tiequipment_id']."\n  eq_cod:".$ticket['tiobjectcode']."\n");
+	//Yii::warning("\n--- int ext ---------------------------------------\n [".$ticket['tioosbegin']."]: ".date('d-m-Y H:i:s',$ibegin)."  = ".$ibegin." \n [".$ticket['tioosend']."]: ".date('d-m-Y H:i:s',$iend)."  = ".$iend."\n  eq_id:".$ticket['tiequipment_id']."\n  eq_cod:".$ticket['tiobjectcode']."\n");
 
 		}	// foreach
 
@@ -274,16 +297,23 @@ class Report_RepairsList extends Model
 		}
 		$ellist .= ")";
 		$sql = "SELECT * from (
-SELECT e2.elnum, e2.worknum, p.*  FROM (SELECT a.sid, COUNT(a.sid) elnum, SUM(a.st) worknum
-   FROM (SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.tiopstatus st, e.* FROM elevator e  INNER JOIN 
-       (SELECT t.tiequipment_id, t.tiopstatus, MAX(t.tistatustime) lasttime, t.tifacility_id
-           FROM ticket t WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1)
-                GROUP BY t.tiequipment_id) s ON e.id = s.tiequipment_id) a GROUP BY a.sid) e2 INNER JOIN
-                 (SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.lasttime, s.tiopstatus st, e.*
-                    FROM elevator e INNER JOIN (SELECT t.tiequipment_id, t.tiopstatus,
-             MAX(t.tistatustime) lasttime, t.tifacility_id 
-             FROM ticket t WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1)
-             GROUP BY t.tiequipment_id) s ON e.id = s.tiequipment_id) p ON  p.sid = e2.sid
+  SELECT e2.elnum, e2.worknum, p.*
+     FROM (SELECT a.sid, COUNT(a.sid) elnum, SUM(a.st) worknum
+     FROM (SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.tiopstatus st, e.*
+          FROM elevator e
+            INNER JOIN 
+          (SELECT t.tiequipment_id, t.tiopstatus, a.lasttime, t.tifacility_id 
+       FROM ticket t, (SELECT t.tiequipment_id tid,  MAX(t.tistatustime) lasttime 
+     FROM ticket t WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1) GROUP BY tid) a
+  WHERE t.tistatustime = a.lasttime AND t.tiequipment_id = a.tid) s ON e.id = s.tiequipment_id) a GROUP BY a.sid) e2
+INNER JOIN
+  (SELECT CONCAT (e.elfacility_id, e.elporchno) sid, s.lasttime, s.tiopstatus st, e.*
+     FROM elevator e INNER JOIN (SELECT t.tiequipment_id, t.tiopstatus, a.lasttime, t.tifacility_id 
+       FROM ticket t, (SELECT t.tiequipment_id tid,  MAX(t.tistatustime) lasttime 
+         FROM ticket t WHERE t.tiequipment_id IN (SELECT id FROM elevator WHERE eldevicetype = 1) 
+        GROUP BY tid) a 
+   WHERE t.tistatustime = a.lasttime AND t.tiequipment_id = a.tid) s ON e.id = s.tiequipment_id) p ON  p.sid = e2.sid 
+       ORDER BY p.id
         ) x where x.id in ".$ellist." ;";
 		$elparams = Yii::$app->db->createCommand($sql)->queryAll();	
 		

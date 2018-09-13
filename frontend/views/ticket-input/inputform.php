@@ -19,24 +19,26 @@ $this->params['breadcrumbs'][] = $this->title;
 <h1><?= Html::encode($this->title)?></h1> 
 
 <div class="row">
-  <div class="col-md-6">
 
+	<?php // --- Левая колонка ------------------------------------------------------------------------ ?>
+	<div class="col-md-6">
       <div class="row">
         <div class="col-md-2">
           <?php echo Html::label(Yii::t('ticketinputform','Source')); ?>
         </div>
         <div class="col-md-5">
-          <?php echo Html::dropDownList('tiSource', 'null', ['ЦДС:Телефон'=>Yii::t('ticketinputform','Phone'), 'ЦДС:Письменное обращение'=>Yii::t('ticketinputform','Written appeal'),'ЦДС:1562'=>'1562'],  //2001,2002
-                                                            ['id'=>'SourceSelect','class'=>'form-control']); ?> 
+          <?php echo Html::dropDownList('tiSource', 'null', ['ЦДС:Телефон'=>Yii::t('ticketinputform','Phone'), 'ЦДС:Письменное обращение'=>Yii::t('ticketinputform','Written appeal'),'ЦДС:1562'=>'1562'], ['id'=>'SourceSelect','class'=>'form-control']); ?> 
         </div>
       </div>
+
 
       <div class="row">
         <div class="col-md-2">
           <?php echo Html::label(Yii::t('ticketinputform','Object')); ?>
         </div>
         <div class="col-md-5">
-          <?php echo Html::dropDownList('tiObject', 'null', ArrayHelper::map($model->tiObjects,'tiobjectcode','tiobject'),['id'=>'ObjectsSelect','class'=>'form-control','onChange'=>'onSelectObject()']); ?> 
+          <?php $tiobj = is_null($_SESSION['InputTicketSelectObject'])?"001":$_SESSION['InputTicketSelectObject'] ;?>
+          <?php echo Html::dropDownList('tiObject', $tiobj, ArrayHelper::map($model->tiObjects,'tiobjectcode','tiobject'),['id'=>'ObjectsSelect','class'=>'form-control','onChange'=>'onSelectObject()']); ?> 
         </div>
       </div>
 
@@ -47,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <div class="col-md-8" id='divProblemSelect' onChange='onSelectProblem()'>
           <?php //echo Html::dropDownList('tiProblem', 'null', ArrayHelper::map($model->tiProblems,'tiproblemtypecode','tiproblemtypetext'),['id'=>'ProblemSelect','class'=>'form-control']); ?> 
-          <?php echo $model->getProblemsList(1); ?>
+          <?php echo $model->getProblemsList($tiobj); ?>
         </div>
       </div>
 
@@ -97,15 +99,17 @@ $this->params['breadcrumbs'][] = $this->title;
           <?php echo Html::textarea('tiComment','',['id'=>'tiCommentInput','style'=>"resize: none",'class'=>'form-control', 'rows'=>5, 'maxlength' => 512]); ?> 
         </div>
       </div>
+	</div>
 
-  </div>
+	<?php // --- Правая колонка ------------------------------------------------------------------------ ?>
+	<div class="col-md-6">
 
-  <div class="col-md-6">
       <div class="row">
         <div class="col-md-2">
-          <?php echo Html::label(Yii::t('ticketinputform','Region')); ?>
+          <?php echo Html::label(Yii::t('ticketinputform','Region'),NULL,['id'=>'labelRegion']); ?>
         </div>
         <div class="col-md-8">
+          <?php $tireg = is_null($_SESSION['InputTicketSelectRegion'])?'null':$_SESSION['InputTicketSelectRegion'] ;?>
           <?php echo Html::dropDownList('tiRegion', 'null', ArrayHelper::map($model->tiRegions,'districtcode','districtname'), ['id'=>'tiRegionSelect','class'=>'form-control','onChange'=>'onSelectRegion()']); ?> 
         </div>
       </div>
@@ -183,12 +187,15 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
       </div>
 
-  </div>
-
+	</div>
 
 </div>
-  <br>
-      <div class="row">
+
+<?php // --- Выбор исполнителя ------------------------------------------------------------------------ ?>
+<br>
+<div class="row">
+	<?php // Выбор приоритета заявки  ?>
+	<div class="row">
         <div class="col-md-1">
           <?php echo Html::label(Yii::t('ticketinputform','Priority')); ?>
         </div>
@@ -203,13 +210,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ['id'=>'PrioritySelect','class'=>'form-control','onChange'=>'onSelectPriority()']); 
           ?> 
         </div>
-      </div>      
+    </div>      
+
+	<?php // Выбор исполнителя  ?>
 
       <div class="row" >
         <div class="col-md-1">
-          <?php echo Html::label(Yii::t('ticketinputform','Executant')); ?>
+          <?php echo Html::label(Yii::t('ticketinputform','Executant'),NULL,['id'=>'labelExecutant']); ?>
         </div>
-        <div class="col-md-4" id="divExecutantLas">
+
+       	<?php // --- Список лифтовых ЛАСовцев  ?>
+		<div class="col-md-4" id="divExecutantLas" hidden>
           <?php 
              echo Select2Widget::widget(
                 [
@@ -217,381 +228,80 @@ $this->params['breadcrumbs'][] = $this->title;
                   'name' => 'tiExecutant',
                   'items'=> ArrayHelper::map($model->tiExecutantsLas, 'id','text'),
                   'settings' => [ 'width' => '100%' ],                 
+                  'events' => [ 'select2:select' =>'onSelectExecutant'],
                 ]
           );      
           
           ?>
         </div>
-        <div class="col-md-4" id="divExecutantDep">
+        <div class="col-md-4" id="divExecutantDep" hidden>
         </div>
-        <div class="col-md-4" id="divExecutantDepsList">
-          <?php echo Html::dropDownList('tiDepSelect','null',ArrayHelper::map($model->tiDepsList,'id','divisionname'),['id'=>'tiDepSelect','class'=>'form-control']); ?>
+        <div class="col-md-4" id="divExecutantDepsList" >
+          <?php echo Html::dropDownList('tiDepSelect','null',ArrayHelper::map($model->tiDepsList,'id','divisionname'),['id'=>'tiDepSelect','class'=>'form-control', 'onChange'=>'onSelectExecutant()']); ?>
         </div>
 
-        <div class="col-md-4" id="divVDESExecutantLas">
+        <div class="col-md-4" id="divVDESExecutantLas" hidden>
           <?php 
              echo Select2Widget::widget(
                 [
                   'id' => 'tiVDESExecutantSelectt',
                   'name' => 'tiVDESExecutant',
                   'items'=> ArrayHelper::map($model->getExecutantsListVDESForLAS(), 'id','text'),
-                  'settings' => [ 'width' => '100%' ],                 
+                  'settings' => [ 'width' => '100%' ],    
+                  'events' => [ 'select2:select' =>'onSelectExecutant'],
                 ]
           );      
           ?>
         </div>
-        <div class="col-md-4" id="divVDESExecutantDepsList">
-          <?php echo Html::dropDownList('tiVDESDepSelect','null',ArrayHelper::map($model->getDivisionsListVDESForMaster(),'id','divisionname'),['id'=>'tiVDESDepSelect','class'=>'form-control','onChange'=>'OnSelectDep()']); ?>
+        <div class="col-md-4" id="divVDESExecutantDepsList" hidden>
+          <?php echo Html::dropDownList('tiVDESDepSelect','null',ArrayHelper::map($model->getDivisionsListVDESForMaster(),'id','divisionname'),['id'=>'tiVDESDepSelect','class'=>'form-control','onChange'=>'onSelectExecutant()']); ?>
+        </div>
+        <div class="col-md-4" id="divDispExecutantDepsList" hidden>
+          <?php echo Html::dropDownList('tiDispDepSelect','null',ArrayHelper::map($model->tiDispDepsList,'id','divisionname'),['id'=>'tiDispDepSelect','class'=>'form-control', 'onChange'=>'onSelectExecutant()']); ?>
         </div>
         <div class="col-md-4" id="divNoExecutantWarning" style="color:red;" hidden>
           Необходимо выбрать подразделение!
         </div>
       </div>
 
-<!--
-      <div class="row">
-        <div class="col-md-1">
-          <?php echo Html::label(Yii::t('ticketinputform','Comment')); ?>
-        </div>
-        <div class="col-md-8">
-          <?php echo Html::textarea('tiComment2','',['id'=>'tiComment2Input','style'=>"resize: none",'class'=>'form-control', 'rows'=>5, 'maxlength' => 512]); ?> 
-        </div>
-      </div>
--->
-<br>
+</div>
 
+<?php // --- Кнопка "отправить" ------------------------------------------------------------------------ ?>
+<br>
 <div class="row">
   <div class="col-md-offset-1">
     <?php echo Html::submitButton(Yii::t('ticketinputform','Transfer to LAS'),['id' => 'SubmitButton', 'class'=>'submit btn btn-success']); ?>
   </div>
 </div>
 
-<?php
-echo Html::endForm();
+<?php 		// Подключаем нужные скрипты 
+	
+	//--- Инициализация JS переменных ---
+
+	// Адреса контроллеров лоя AJAX
+	$script =  "var tiajx_addr1='".Url::toRoute(["get-streets-list"])."';";
+	$script .= "var tiajx_addr2='".Url::toRoute(['get-facility-list'])."';";
+	$script .= "var tiajx_addr3='".Url::toRoute(["get-problems-list"])."';";
+	$script .= "var tiajx_addr4='".Url::toRoute(["get-elevators-list"])."';";
+	$script .= "var tiajx_addr5='".Url::toRoute(["get-elevator-division"])."';";
+	$script .= "var tiajx_addr6='".Url::toRoute(["get-entrance-with-elevators"])."';";
+
+	// Названия поля ввода лифта/щита
+	$script .= "var tivar_strElCapElevator ='".Html::label(Yii::t('ticketinputform','Elevator'))."';";
+	$script .= "var tivar_strElCapPanel ='". Html::label(Yii::t('ticketinputform','Panel'))."';";
+
+	// Названия для кнопки отправки
+	$script .= "var tivar_strBttnCapLas = '".Yii::t('ticketinputform','Transfer to LAS')."';";
+	$script .= "var tivar_strBttnCapMaster = '".Yii::t('ticketinputform','Transfer to mster')."';";
+
+	// Занчение района по умолчанию
+	$script .= "var tivar_RegionDefault='".$_SESSION['InputTicketSelectRegion']."';";
+	//$script .= "var tivar_RegionDefault='".'5'."';";	// ! ! ! Для отладки
+
+	//--- Пдключение скриптов ---
+	$this->registerJs($script, yii\web\View::POS_BEGIN);
+	$this->registerJsFile('js/ticketinputform.js');
+	$this->registerJs("Initialization();", yii\web\View::POS_LOAD);
 ?>
-
-<?php
-$addr1 = Url::toRoute(["get-streets-list"]);
-$addr2 = Url::toRoute(["get-facility-list"]);
-$addr3 = Url::toRoute(["get-problems-list"]);
-$addr4 = Url::toRoute(["get-elevators-list"]);
-$addr5 = Url::toRoute(["get-elevator-division"]);
-$addr6 = Url::toRoute(["get-entrance-with-elevators"]);
-
-$str1 = '"'.Yii::t('ticketinputform','Transfer to LAS').'"';
-$str2 = '"'.Yii::t('ticketinputform','Transfer to mster').'"';
-$str3 = "'".Html::input('text','tiEntrance','',['id'=>'tiEntranceInput','class'=>'form-control'])."'";
-
-$strElCapElevator = Html::label(Yii::t('ticketinputform','Elevator'));
-$strElCapPanel = Html::label(Yii::t('ticketinputform','Panel'));
-
-$script = <<< JS
-
-var DivId = null;
-
-$(window).load(function () {
-  onSelectRegion();
-  onSelectStreet();
-  CheckElevatorInputNeeded();
-  CheckForLasNeeded();
-});
-
-function LoadExecutants(){
-
-}
-
-function CheckElevatorInputNeeded(){
-  if ($("#ObjectsSelect").val() < 3){
-    $("#divElevatorSelectRow").show();
-    $("#divApartment").hide();
-    //$("#divEntrance").hide();
-    if ($("#ObjectsSelect").val() == 1){
-      $("#divElevatorSelectCaption").html("$strElCapElevator");
-    }else{
-      $("#divElevatorSelectCaption").html("$strElCapPanel");
-    }
-
-    ElevatorSelectUpdate();
-  }else{
-    $("#divElevatorSelectRow").hide();
-    $("#divApartment").show();
-    //$("#divEntrance").show();
-  }
-}
-
-function CheckForLasNeeded(){
-  if (1 == $("#ObjectsSelect").val()) {
-    // если объект - лифты
-    $("#divVDESExecutantLas").hide();
-    $("#divVDESExecutantDepsList").hide();
-    if ( 1 == $("#ProblemSelect").val() ) {  
-        $("#divExecutantLas").show();
-        $( "input[name$='DivisionType']" ).val( 1 );
-        $("#divExecutantDep").hide();
-        $("#divExecutantDepsList").hide();
-        $("#SubmitButton").html($str1);
-    }else{
-      var date = new Date();
-      var hour = date.getHours() ;
-      if ((hour<8) || (hour>16)){
-          $("#divExecutantLas").show();
-          $( "input[name$='DivisionType']" ).val( 1 );
-          $("#divExecutantDep").hide();
-          $("#divExecutantDepsList").hide();
-          $("#SubmitButton").html($str1);
-      }else{
-          $("#divExecutantLas").hide();
-
-          var ElevatorsNumber = document.getElementById("tiElevatorSelect").options.length;
-
-          if (ElevatorsNumber>0){
-            $( "input[name$='DivisionType']" ).val( 0 );
-            $("#divExecutantDepsList").hide();
-            $("#divExecutantDep").show();
-          }else{
-            $( "input[name$='DivisionType']" ).val( 2 );
-            $("#divExecutantDepsList").show();
-            $("#divExecutantDep").hide();
-          }
-
-
-          $("#SubmitButton").html($str2);
-      }
-    }
-  }else{
-    // если объект - не лифты
-    $("#divExecutantDep").hide();
-    $("#divExecutantDepsList").hide();
-    $("#divExecutantLas").hide();
-    //console.log($("#PrioritySelect").val());
-
-    if ( $("#PrioritySelect").val() == 'EMERGENCY') {
-      // срочная заявка
-      $("#divVDESExecutantLas").show();
-      $("#divVDESExecutantDepsList").hide();
-      $("#SubmitButton").html($str1);
-      $( "input[name$='DivisionType']" ).val( 4 );
-      HideTransparencyNoExecutant();
-
-
-    }else{
-      $("#SubmitButton").html($str2);
-      $("#divVDESExecutantLas").hide();        
-
-      $("#divVDESExecutantDepsList").show();
-      $( "input[name$='DivisionType']" ).val( 5 );
-
-      DoSelectDep();
-    /*
-      var PanelsNumber = document.getElementById("tiElevatorSelect").options.length;
-      if (PanelsNumber>0){
-        $("#divVDESExecutantDepsList").hide();
-        $("#divExecutantDep").show();
-        $( "input[name$='DivisionType']" ).val( 3 );
-      }else{
-        $("#divVDESExecutantDepsList").show();
-        $("#divExecutantDep").hide();
-        $( "input[name$='DivisionType']" ).val( 5 );
-      }
-      */
-
-    }   
-      
-  }
-
-}
-
-function onSelectPriority() {
-  CheckForLasNeeded();
-}
-
-function onSelectStreet(){
-    $.ajax({
-         url: '$addr2',
-         type: "POST",
-         dataType: "json",
-         data: {StreetId: $("#tiStreetSelect").val()},
-         success: function(datamas) {
-                $("#tiFacilitySelect").html("");
-                $("#tiFacilitySelect").select2({data:datamas, width:'100%'});
-                EntranceSelectUpdate();
-         },
-         error:   function() {
-                $("#tiFacilitySelect").html('AJAX error!');
-         }
-
-  });
-  return false;
-}
-
-function onSelectRegion(){
-    $.ajax({
-         url: '$addr1',
-         type: "POST",
-         dataType: "json",
-         data: {District: $("#tiRegionSelect").val()},
-         success: function(datamas) {
-                $("#tiStreetSelect").html("");
-                $("#tiStreetSelect").select2({data:datamas, width:'100%'});
-                onSelectStreet();
-         },
-         error:   function() {
-                $("#tiStreetSelect").html('AJAX error!');
-         }
-
-  });
-  return false;
-}
-
-function onSelectProblem(){
-    CheckForLasNeeded();
-    return true;
-}
-
-function onSelectObject(){
-    CheckElevatorInputNeeded();
-    $.ajax({
-         url: '$addr3',
-         type: "POST",
-         dataType: "json",
-         data: {ObjectId: $("#ObjectsSelect").val()},
-         success: function(data) {
-              $("#divProblemSelect").html(data);
-              onSelectProblem();
-              CheckForLasNeeded();
-              EntranceSelectUpdate();
-         },
-         error:   function() {
-              $("#divProblemSelect").html('AJAX error!');
-         }
-
-
-    });
-    CheckForLasNeeded();
-    return false;
-}
-
-function ElevatorSelectUpdate(){
-    $.ajax({
-         url: '$addr4',
-         type: "POST",
-         dataType: "json",
-         data: {
-            FacilityId: $("#tiFacilitySelect").val(),
-            EntranceId: $("#tiEntranceInput").val(),
-            ObjectId: $("#ObjectsSelect").val()
-         },
-         success: function(datamas) {
-                $("#divElevatorSelect").html(datamas['Elevators']);
-                GetElDivision();
-                CheckForLasNeeded();
-         },
-         error:   function() {
-                $("#divElevatorSelect").html('AJAX error!');
-         }
-
-  });
-}
-
-// обновление списка подъездов в доме
-function EntranceSelectUpdate(){
-    if ('XXX' !== $("#ObjectsSelect").val())                  // просто убрал проверку
-    {  
-        $.ajax({
-             url: '$addr6',
-             data: {FacilityId: $("#tiFacilitySelect").val(), 
-                    ObjectId: $("#ObjectsSelect").val()},
-             success: function(datamas) {
-                    $("#divEntranceInput").html(datamas);
-                    ElevatorSelectUpdate();
-             },
-             error:   function() {
-                    $("#divEntranceInput").html('AJAX error!');
-             }
-
-        });
-    }else{
-        $("#divEntranceInput").html($str3);
-    }
-}
-
-function onSelectFacility(){
-  EntranceSelectUpdate();
-}
-
-function onSelectEntrance(){
-  ElevatorSelectUpdate();
-}
-
-function ShowTransparencyNoExecutant(){
-  if (1 != $("#ObjectsSelect").val()) {
-    if ( $("#PrioritySelect").val() != 'EMERGENCY') {
-      $("#divNoExecutantWarning").show();
-      $("#SubmitButton").attr('disabled', 'disabled');
-    }
-  }  
-}
-
-function HideTransparencyNoExecutant(){
-    $("#divNoExecutantWarning").hide();
-    $("#SubmitButton").removeAttr('disabled');
-}
-
-function OnSelectDep(){
-  HideTransparencyNoExecutant();
-  DivId = $("#tiVDESDepSelect").val();
-}
-
-// выбрать пункт в выпадающем списке выбора исполнителя
-function DoSelectDep(){
-  if (1 == $("#ObjectsSelect").val()) {
-    // если объект - лифты
-    $("#tiDepSelect").val(DivId)
-    $("#divNoExecutantWarning").hide();
-    $("#SubmitButton").removeAttr('disabled');
-  }else{
-    // если объект - не лифты
-    $("#tiVDESDepSelect").val(DivId)
-    if (DivId == null) {
-      console.log("NoDivId");
-      ShowTransparencyNoExecutant();
-    }else{
-      HideTransparencyNoExecutant();
-    }
-  }
-
-}
-
-function GetElDivision(){
-    $.ajax({
-         url: '$addr5',
-         type: "POST",
-         dataType: "json",
-         data: {ElevatorId: $("#tiElevatorSelect").val(),
-                ObjectId: $("#ObjectsSelect").val()},
-         success: function(datamas) {
-                $("#divExecutantDep").html(datamas['DivName']);
-                DivId = datamas['DivId'];
-                DoSelectDep();
-         },
-         error:   function() {
-                $("#divExecutanDep").html('AJAX error!');
-         }
-
-  });
-}
-
-function onSelectElevator(){
-  GetElDivision();
-}
-
-
-
-JS;
-
-$this->registerJs($script, yii\web\View::POS_END);
-
-?>
-
 
 

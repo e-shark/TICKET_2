@@ -28,6 +28,7 @@ class TicketInputController extends Controller
         $this->tifModel->tiRegions = TicketInputForm::getTiRegions();
         $this->tifModel->tiExecutantsLas = TicketInputForm::getExecutantsListForLAS();
         $this->tifModel->tiDepsList = TicketInputForm::getDivisionsListForMaster();
+        $this->tifModel->tiDispDepsList = TicketInputForm::getDivisionsListForDispatcher();
 
         return $this->render( 'inputform', [ 'model' => $this->tifModel ] );
     }
@@ -39,7 +40,11 @@ class TicketInputController extends Controller
         if(Yii::$app->request->isPost) {
             $data = Yii::$app->request->post();
             if (! empty($data)){
-                $RegionID =  0 + $data['District'];
+                //$RegionID =  0 + $data['District'];
+                if (empty($data['District']))
+                    $RegionID = '-';
+                else
+                    $RegionID = $data['District'];
                 $res = json_encode(TicketInputForm::getStreetsList($RegionID, $data['f_all']));
             }
         }
@@ -137,6 +142,11 @@ class TicketInputController extends Controller
             if (! empty($data)){
                 $nowdate = date("Y-m-d H:i:s");
 
+                if (!empty($data['tiRegion']))
+                    $_SESSION['InputTicketSelectRegion'] = $data['tiRegion'];
+                if (!empty($data['tiObject']))
+                    $_SESSION['InputTicketSelectObject'] = $data['tiObject'];
+
                 $Ticket = new TicketAddData();
                 $Ticket->ticodeex = NULL;
                 $Ticket->tipriority = $data['tiPriority'];
@@ -218,6 +228,11 @@ class TicketInputController extends Controller
                     case 4:  // из списка ЛАС ВДЭС
                         $Ticket->tiexecutant_id = $data['tiVDESExecutant'];
                         $Ticket->tidesk_id = $Ticket->tioriginatordesk_id; 
+                        $SMSReciver = $Ticket->tiexecutant_id;
+                        break;
+
+                    case 6:  // из списка диспетчеров
+                        $Ticket->tiexecutant_id = $data['tiDispDepSelect'];
                         $SMSReciver = $Ticket->tiexecutant_id;
                         break;
                 }

@@ -16,6 +16,7 @@ class TicketInputForm extends Model
 	public $tiRegions;
 	public $tiExecutantsLas;
 	public $tiDepsList;
+	public $tiDispDepsList;
 
 
 	public static function getTiObjects()
@@ -34,6 +35,7 @@ class TicketInputForm extends Model
 	public static function getTiRegions()
 	{
 		$vtiRegions = Yii::$app->db->createCommand('SELECT districtname, districtcode FROM district where districtlocality_id=159;')->queryAll();	
+		//array_unshift($vtiRegions, ['districtname'=>'не выбрано', 'districtcode'=> 0]);
 		return $vtiRegions;
 	}
 
@@ -85,9 +87,11 @@ class TicketInputForm extends Model
 	// Получить список возможных неисправностей
 	public static function getProblemsList( $ObjectId = 0)
 	{
+		$default= 'null';
+		if (1==$ObjectId) $default=3;
 		$ObjectName =  Yii::$app->db->createCommand('SELECT tiobject, tiobjectcode FROM ticketobject WHERE tiobjectcode = '.$ObjectId.';')->queryOne()['tiobject'];
 		$Problems =  Yii::$app->db->createCommand('SELECT id, tiproblemtypetext, tiproblemtypecode FROM ticketproblemtype WHERE tiproblemtypetext like "%'.$ObjectName.'%";')->queryAll();	
-		$res = Html::dropDownList('tiProblem', 'null', ArrayHelper::map($Problems,'id','tiproblemtypetext'),['id'=>'ProblemSelect','class'=>'form-control']); //'onChange' => 'onSelectProblem'
+		$res = Html::dropDownList('tiProblem', $default, ArrayHelper::map($Problems,'id','tiproblemtypetext'),['id'=>'ProblemSelect','class'=>'form-control']); //'onChange' => 'onSelectProblem'
 		return $res;
 	}
 
@@ -178,7 +182,7 @@ class TicketInputForm extends Model
 
 	public static function getDivisionsListForMaster()
 	{
-    	$divigions = Yii::$app->db->createCommand('SELECT d.id,d.divisionname from employee e join division d on e.division_id=d.id where e.oprights like"%M%" and d.divisioncodesvc like "%L%";')->queryAll();
+		$divigions = Yii::$app->db->createCommand('SELECT d.id,d.divisionname from employee e join division d on e.division_id=d.id where e.oprights like"%M%" and d.divisioncodesvc like "%L%";')->queryAll();
 		return  $divigions;
 	}
 
@@ -206,6 +210,12 @@ class TicketInputForm extends Model
     	if (!is_null( $eldivigion['divname'])) {$res['DivName'] = $eldivigion['divname'];}
     	else {$res['DivName'] = "";}
 		return  $res;
+	}
+
+	public static function getDivisionsListForDispatcher()
+	{
+		$divigions = Yii::$app->db->createCommand('SELECT d.id,d.divisionname from employee e join division d on e.division_id=d.id where e.oprights like"%M%" and d.divisioncodesvc like "%D%";')->queryAll();
+		return  $divigions;
 	}
 
 }
