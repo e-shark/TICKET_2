@@ -173,7 +173,7 @@ $this->params['breadcrumbs'][] = $this->title;
 				if (tkt.MarkerIndex == marker.index) {
 					contentString += '<li> '+
 					'<a href="<?php echo Url::toRoute(['tickets/view']); ?>&id='+ tkt.id +'" target="_blank">'+
-					tkt.ticode +'<a>'+
+					tkt.ticode +'</a>'+
 					' </li>';
 				}
 			});

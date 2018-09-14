@@ -187,6 +187,12 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
       </div>
 
+      <br>
+      <div class="row" id='divTicketsList' >
+        <div class="col-md-12" >
+      	  <?php //Здесь будет отображаться перечень заявок по лифту?>
+      	</div>
+      </div>
 	</div>
 
 </div>
@@ -285,6 +291,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	$script .= "var tiajx_addr4='".Url::toRoute(["get-elevators-list"])."';";
 	$script .= "var tiajx_addr5='".Url::toRoute(["get-elevator-division"])."';";
 	$script .= "var tiajx_addr6='".Url::toRoute(["get-entrance-with-elevators"])."';";
+	$script .= "var tiajx_addr7='".Url::toRoute(["get-elevator-tickets-list"])."';";
 
 	// Названия поля ввода лифта/щита
 	$script .= "var tivar_strElCapElevator ='".Html::label(Yii::t('ticketinputform','Elevator'))."';";

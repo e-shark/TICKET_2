@@ -120,6 +120,7 @@ class TicketInputController extends Controller
         return $res;
     }
 
+
     // Определить, к какому подразделению передавать заявку по лифту
     public function actionGetElevatorDivision()
     {
@@ -130,6 +131,20 @@ class TicketInputController extends Controller
                 $ElevatorId =  0 + $data['ElevatorId'];
                 $ObjectId = $data['ObjectId'];
                 $res = TicketInputForm::getElevatorDivision($ElevatorId,$ObjectId);
+            }
+        }
+        return json_encode($res);
+    }
+
+    // Получить список заявок по лифту/щиту
+    public function actionGetElevatorTicketsList()
+    {
+        $res = "";
+        if(Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post();
+            if (! empty($data)){
+                $EquipmentID =  0 + $data['EquipmentID'];
+                $res = TicketInputForm::getEquipmentTicketsList($EquipmentID);
             }
         }
         return json_encode($res);

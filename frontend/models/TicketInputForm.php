@@ -4,6 +4,7 @@ namespace frontend\models;
 use yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use zxbodya\yii2\galleryManager\GalleryBehavior;
@@ -218,4 +219,31 @@ class TicketInputForm extends Model
 		return  $divigions;
 	}
 
+	public function getEquipmentTicketsList($EquipmentID)
+	{
+		$res = "";
+		$sql = "SELECT tck.id, ticode, tiopenedtime, tiproblemtype_id, tpt.tiproblemtypetext, tiproblemtext 
+				from ticket tck
+				left join ticketproblemtype tpt on tpt.id = tck.tiproblemtype_id
+				where tiequipment_id = :eid order by tiopenedtime desc ; " ;
+		$tickets = Yii::$app->db->createCommand($sql)->bindValues([':eid'=>$EquipmentID])->queryAll();	
+
+		if (!empty($tickets))  {
+			$cnt = count($tickets);
+			$res = 'заявок: '.$cnt;
+			$res .= '<div class="col-md-12" style="overflow-y:auto; overflow-x:visible; height:200px;">';
+			$res .= '<div style="font-size:85%;"> ';
+			foreach($tickets as $ticket){
+				$res .= '<div class="row" >';
+				$res .= '<div class="col-md-3">'. '<a href="'.Url::toRoute(['tickets/view']).'&id='.$ticket['id'].'" target="_blank">'.$ticket['ticode'].'</a>' .'</div>';
+				$res .= '<div class="col-md-3">'. (new \DateTime($ticket['tiopenedtime'], new \DateTimeZone("UTC")))->format('d-m-Y H:i:s'). '</div>';
+				$problemtext = empty($ticket['tiproblemtypetext'])?$ticket['tiproblemtext']:$ticket['tiproblemtypetext'];
+				$res .= '<div class="col-md-6">'. $problemtext .'</div>';
+				$res .= '</div> ';				
+			}
+			$res .= '</div> ';				
+			$res .= '</div> ';				
+		}
+		return $res;
+	}
 }

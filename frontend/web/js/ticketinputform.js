@@ -110,8 +110,11 @@ function onSelectEntrance() {
 
 //----------------------------------------------------------------
 function onSelectElevator(){
-  GetElDivision();
-  FromValidate();
+	if ( (null != $("#tiElevatorSelect").val()) && ( "" != $("#tiElevatorSelect").val()) && ( 0 != $("#tiElevatorSelect").val()) ) {
+	}
+	GetElevatorTicketsList();
+	GetElevatorDivision();
+	FromValidate();
 }
 
 //----------------------------------------------------------------
@@ -184,8 +187,7 @@ function ElevatorSelectUpdate(){
          },
          success: function(datamas) {
                 $("#divElevatorSelect").html(datamas['Elevators']);
-                GetElDivision();
-                FromValidate();
+                onSelectElevator();
          },
          error:   function() {
                 $("#divElevatorSelect").html('AJAX error!');
@@ -215,7 +217,7 @@ function EntranceSelectUpdate(){
 
 //----------------------------------------------------------------
 // Получить с сервера ID департамента для выбранного лифтаы
-function GetElDivision() {
+function GetElevatorDivision() {
     $.ajax({
          url: tiajx_addr5,
          type: "POST",
@@ -231,8 +233,31 @@ function GetElDivision() {
                 $("#divExecutanDep").html('AJAX error!');
          }
 
-  });
-  console.log("GetElDivision: ElevatorId="+ $("#tiElevatorSelect").val()+" ObjectId="+$("#ObjectsSelect").val()+" -> DivId="+DivId);
+	});
+	console.log("GetElDivision: ElevatorId="+ $("#tiElevatorSelect").val()+" ObjectId="+$("#ObjectsSelect").val()+" -> DivId="+DivId);
+}
+
+//----------------------------------------------------------------
+// Получить список заявок для лифта/щита
+function GetElevatorTicketsList(){
+
+	if ( (elevator_needed || panel_needed) &&
+		(null != $("#tiElevatorSelect").val()) && ( "" != $("#tiElevatorSelect").val()) && ( 0 != $("#tiElevatorSelect").val()) ) {
+		$.ajax({
+			url: tiajx_addr7,
+			type: "POST",
+			dataType: "json",
+			data: {EquipmentID: $("#tiElevatorSelect").val(),
+			ObjectId: $("#ObjectsSelect").val()},
+			success: function(data) {
+				$("#divTicketsList").html(data);
+			},
+			error:   function() {
+				$("#divTicketsList").html('AJAX error!');
+			}
+		});
+	}
+	else $("#divTicketsList").html("");
 }
 
 //----------------------------------------------------------------
