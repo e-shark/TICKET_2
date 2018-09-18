@@ -80,7 +80,8 @@ class TicketInputForm extends Model
 	public static function getFacilitiesList( $StreetID = 0, $f_all=false)
 	{
 		if (empty($StreetID)) $StreetID = 0;
-		$vStreets =  Yii::$app->db->createCommand('SELECT facility.id, coalesce(concat(faaddressno," ","сек.",fasectionno),faaddressno) as text FROM street join facility on fastreet_id = street.id where street.id ='.$StreetID.';')->queryAll();	
+		//$vStreets =  Yii::$app->db->createCommand('SELECT facility.id, coalesce(concat(faaddressno," ","сек.",fasectionno),faaddressno) as text FROM street join facility on fastreet_id = street.id where street.id ='.$StreetID.';')->queryAll();	
+		$vStreets =  Yii::$app->db->createCommand('SELECT facility.id, coalesce(concat(fabuildingno," ","сек.",fasectionno),fabuildingno) as text FROM street join facility on fastreet_id = street.id where street.id ='.$StreetID.';')->queryAll();	
 		if ($f_all) array_unshift($vStreets, ['id'=>0,'text'=>'все']);	// вставляем запись "все" в начало массива
 		return $vStreets;
 	}

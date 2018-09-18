@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
           <?php echo Html::label(Yii::t('ticketinputform','Source')); ?>
         </div>
         <div class="col-md-5">
-          <?php echo Html::dropDownList('tiSource', 'null', ['ЦДС:Телефон'=>Yii::t('ticketinputform','Phone'), 'ЦДС:Письменное обращение'=>Yii::t('ticketinputform','Written appeal'),'ЦДС:1562'=>'1562'], ['id'=>'SourceSelect','class'=>'form-control']); ?> 
+          <?php echo Html::dropDownList('tiSource', 'null', ['ЦДС:Телефон'=>Yii::t('ticketinputform','Phone'), 'ЦДС:Письменное обращение'=>Yii::t('ticketinputform','Written appeal'),'ЦДС:1562'=>'1562', 'План ТР'=>'План ТР', 'План КР'=>'План КР'], ['id'=>'SourceSelect','class'=>'form-control']); ?> 
         </div>
       </div>
 
