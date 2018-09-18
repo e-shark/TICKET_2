@@ -280,11 +280,11 @@ $this->params['breadcrumbs'][] = $this->title;
   </div>
 </div>
 
-<?php 		// Подключаем нужные скрипты 
+<?php //==== Подключаем нужные скрипты ============================================
 	
-	//--- Инициализация JS переменных ---
+	//----- Инициализация JS переменных -----
 
-	// Адреса контроллеров лоя AJAX
+	// Адреса контроллеров для AJAX запросов
 	$script =  "var tiajx_addr1='".Url::toRoute(["get-streets-list"])."';";
 	$script .= "var tiajx_addr2='".Url::toRoute(['get-facility-list'])."';";
 	$script .= "var tiajx_addr3='".Url::toRoute(["get-problems-list"])."';";
@@ -305,7 +305,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	$script .= "var tivar_RegionDefault='".$_SESSION['InputTicketSelectRegion']."';";
 	//$script .= "var tivar_RegionDefault='".'5'."';";	// ! ! ! Для отладки
 
-	//--- Пдключение скриптов ---
+	//----- Пдключение скриптов -----
 	$this->registerJs($script, yii\web\View::POS_BEGIN);
 	$this->registerJsFile('js/ticketinputform.js');
 	$this->registerJs("Initialization();", yii\web\View::POS_LOAD);
