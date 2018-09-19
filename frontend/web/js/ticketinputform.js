@@ -340,8 +340,9 @@ function WhichExecutantNeeded(){
 			$("#SubmitButton").html(tivar_strBttnCapMaster); break;
 	} 
 	
+	$( "input[name$='DivisionType']" ).val( ExecutantType );
 
-	console.log( "ExecutantType"+ ExecutantType);
+	console.log( "ExecutantType: "+ ExecutantType);
 }
 
 //----------------------------------------------------------------

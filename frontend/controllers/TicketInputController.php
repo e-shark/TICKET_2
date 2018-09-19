@@ -249,7 +249,7 @@ class TicketInputController extends Controller
                         break;
 
                     case 6:  // из списка диспетчеров
-                        $Ticket->tiexecutant_id = $data['tiDispDepSelect'];
+                        $Ticket->tidesk_id = $data['tiDispDepSelect'];
                         $SMSReciver = $Ticket->tiexecutant_id;
                         break;
                 }
