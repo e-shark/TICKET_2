@@ -91,7 +91,10 @@ class TicketInputForm extends Model
 	{
 		$default= 'null';
 		if (1==$ObjectId) $default=3;
-		$ObjectName =  Yii::$app->db->createCommand('SELECT tiobject, tiobjectcode FROM ticketobject WHERE tiobjectcode = '.$ObjectId.';')->queryOne()['tiobject'];
+		if (4 != $ObjectId)
+			$ObjectName =  Yii::$app->db->createCommand('SELECT tiobject, tiobjectcode FROM ticketobject WHERE tiobjectcode = '.$ObjectId.';')->queryOne()['tiobject'];
+		else
+			$ObjectName ='ДЦ';
 		$Problems =  Yii::$app->db->createCommand('SELECT id, tiproblemtypetext, tiproblemtypecode FROM ticketproblemtype WHERE tiproblemtypetext like "%'.$ObjectName.'%";')->queryAll();	
 		$res = Html::dropDownList('tiProblem', $default, ArrayHelper::map($Problems,'id','tiproblemtypetext'),['id'=>'ProblemSelect','class'=>'form-control']); //'onChange' => 'onSelectProblem'
 		return $res;
