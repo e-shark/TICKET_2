@@ -223,18 +223,20 @@ class TicketInputForm extends Model
 		return  $divigions;
 	}
 
-	public function getEquipmentTicketsList($EquipmentID)
+	public function getEquipmentTicketsList($EquipmentID, $OnlyOpen = true)
 	{
 		$res = "";
+		if ($OnlyOpen) $addsql = 'and tistatus not in ("DISPATCHER_COMPLETE","OPERATOR_COMPLETE","1562_COMPLETE","KAO_COMPLETE") ';
+		else $addsql = " ";
 		$sql = "SELECT tck.id, ticode, tiopenedtime, tiproblemtype_id, tpt.tiproblemtypetext, tiproblemtext 
 				from ticket tck
 				left join ticketproblemtype tpt on tpt.id = tck.tiproblemtype_id
-				where tiequipment_id = :eid order by tiopenedtime desc ; " ;
+				where tiequipment_id = :eid $addsql order by tiopenedtime desc ; " ;
 		$tickets = Yii::$app->db->createCommand($sql)->bindValues([':eid'=>$EquipmentID])->queryAll();	
 
 		if (!empty($tickets))  {
 			$cnt = count($tickets);
-			$res = 'заявок: '.$cnt;
+			$res = ($OnlyOpen?"открытых ":"").'заявок: '.$cnt;
 			$res .= '<div class="col-md-12" style="overflow-y:auto; overflow-x:visible; height:200px;">';
 			$res .= '<div style="font-size:85%;"> ';
 			foreach($tickets as $ticket){

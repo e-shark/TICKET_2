@@ -188,7 +188,7 @@ $this->registerCss( '@media screen {  div#paramsfilter2 { display: none; }
               echo '<div class="left" > Дата&nbsp:&nbsp'.$datefrom.'&nbsp &nbsp &nbsp &nbsp </div>'; 
               goto next; }
             }//разные даты*/
-          echo '<div class="left" > Дата&nbsp:&nbspс&nbsp'.$datefrom;
+          echo '<div class="left" > Дата&nbsp:&nbspс&nbsp'.$datefrom.'&nbsp &nbsp &nbsp &nbsp </div>';
         }
         //----Date up to
         if( array_key_exists('dateto',$model->attributes ) ) {
