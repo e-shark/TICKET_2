@@ -139,8 +139,12 @@ class FitterMetersList extends Model
  FROM  (SELECT * FROM powermeter p) dd
  LEFT OUTER JOIN (
 	SELECT 	n.mdatameter_id A_id, n.mdatatime A_mtime, n.mdata A_mdata,
-			(SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) A_mwho,
-			n.mdatafile A_mfile, n.mdatameterstate A_mstate, n.mdatacomment A_mcomment, n.id A_tid, n.mdatadeltime, n.mdatacode
+		CASE
+			WHEN n.mdatasource <200 OR n.mdatasource is NULL THEN (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) 
+			WHEN n.mdatasource >=200 AND n.mdatasource < 300 THEN 'auto'
+			WHEN n.mdatasource >=300 AND n.mdatasource < 400 THEN 'auto'
+		END AS A_mwho,
+		n.mdatafile A_mfile, n.mdatameterstate A_mstate, n.mdatacomment A_mcomment, n.id A_tid, n.mdatadeltime, n.mdatacode
 	FROM powermeterdata n,
     	(	SELECT MAX(pp.id) id 
       		FROM (	SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND mdatatime >= :DP2 AND mdatadeltime IS NULL ) pp, 
@@ -153,10 +157,14 @@ class FitterMetersList extends Model
 	WHERE n.id = gg.id 
 ) a ON  dd.id = a.A_id 
 LEFT OUTER JOIN (
-   SELECT ppp.mdatameter_id B_id, ppp.mdatatime B_mtime, ppp.mdata B_mdata,
-    (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) B_mwho,
-      ppp.mdatafile B_mfile, ppp.mdatameterstate B_mstate, ppp.mdatacomment B_mcomment, ppp.id B_tid, ppp.mdatadeltime, ppp.mdatacode
-  FROM powermeterdata ppp,
+	SELECT ppp.mdatameter_id B_id, ppp.mdatatime B_mtime, ppp.mdata B_mdata,
+		CASE
+			WHEN ppp.mdatasource <200 OR ppp.mdatasource is NULL THEN (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) 
+			WHEN ppp.mdatasource >=200 AND ppp.mdatasource < 300 THEN 'auto'
+			WHEN ppp.mdatasource >=300 AND ppp.mdatasource < 400 THEN 'auto'
+		END AS B_mwho,
+		ppp.mdatafile B_mfile, ppp.mdatameterstate B_mstate, ppp.mdatacomment B_mcomment, ppp.id B_tid, ppp.mdatadeltime, ppp.mdatacode
+	FROM powermeterdata ppp,
     (SELECT MAX(pp.id) id FROM (SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND mdatatime < :DP1 AND mdatadeltime IS NULL ) pp, 
        (SELECT MAX(p.mdatatime) t, p.mdatameter_id id
         FROM (SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND mdatatime < :DP1 AND  mdatadeltime IS NULL) p 
@@ -165,8 +173,14 @@ LEFT OUTER JOIN (
   WHERE ppp.id = gg.id
 ) b  ON dd.id = b.B_id
 LEFT OUTER JOIN (
-   SELECT ppp.mdatameter_id C_id, ppp.mdatatime C_mtime, ppp.mdata C_mdata,     (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) C_mwho, ppp.mdatafile C_mfile, ppp.mdatameterstate C_mstate, ppp.mdatacomment C_mcomment, ppp.id C_tid, ppp.mdatadeltime, ppp.mdatacode
-   FROM powermeterdata ppp,
+	SELECT ppp.mdatameter_id C_id, ppp.mdatatime C_mtime, ppp.mdata C_mdata,     
+		CASE
+			WHEN ppp.mdatasource <200 OR ppp.mdatasource is NULL THEN (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id )  
+			WHEN ppp.mdatasource >=200 AND ppp.mdatasource < 300 THEN 'auto'
+			WHEN ppp.mdatasource >=300 AND ppp.mdatasource < 400 THEN 'auto'
+		END AS C_mwho, 
+		ppp.mdatafile C_mfile, ppp.mdatameterstate C_mstate, ppp.mdatacomment C_mcomment, ppp.id C_tid, ppp.mdatadeltime, ppp.mdatacode
+	FROM powermeterdata ppp,
     (SELECT MAX(pp.id) id FROM (SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND (mdatatime >= :DP1 and mdatatime < :DP2) AND mdatadeltime IS NULL ) pp, 
        (	SELECT MAX(p.mdatatime) t, p.mdatameter_id id
         	FROM (SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND (mdatatime >= :DP1 and mdatatime < :DP2) AND  mdatadeltime IS NULL) p 
@@ -179,7 +193,7 @@ JOIN facility fa on fa.id = dd.meterfacility_id
 JOIN street st on st.id=fa.fastreet_id  
 ORDER BY 1 ";
 		$sqltext = "SELECT s.* FROM ( ".$sqltext." ) s WHERE id>0 ".$filter ; 
-		//Yii::warning("************************************************SQL*******************************[\n".$sqltext."\n]");
+		Yii::warning("************************************************SQL*******************************[\n".$sqltext."\n]");
 		//Yii::warning("************************************************filter****************************[\n".$filter."\n]");
 		$provider = new SqlDataProvider([
 			'sql' => $sqltext,

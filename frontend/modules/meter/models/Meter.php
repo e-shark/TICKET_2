@@ -53,7 +53,15 @@ class Meter extends Model
 	public function GetReadings($id)
 	{
 		//$sqltext = "SELECT * FROM powermeterdata where mdatameter_id=".$id." and (mdatadeltime is null) order by mdatatime desc ";
-		$sqltext = "SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) as employee, pm.* FROM powermeterdata pm left join  employee e on pm.mdatawho=e.id where mdatameter_id={$id} and (mdatadeltime is null) and (mdatacode='1.8.0') order by mdatatime desc, id desc ";
+		$sqltext = "SELECT CASE
+						WHEN pm.mdatasource <200 OR pm.mdatasource is NULL THEN concat(e.lastname,' ',e.firstname,' ',e.patronymic) 
+                    	WHEN pm.mdatasource >=200 AND pm.mdatasource < 300 THEN 'auto'
+                    	WHEN pm.mdatasource >=300 AND pm.mdatasource < 400 THEN 'auto'
+                    END as employee, pm.* 
+                    FROM powermeterdata pm 
+                    left join  employee e on pm.mdatawho=e.id 
+                    where mdatameter_id={$id} and (mdatadeltime is null) and (mdatacode='1.8.0') 
+                    order by mdatatime desc, id desc ";
 		$result = new SqlDataProvider([ 'sql' => $sqltext ]);
 		return $result;
 	}
@@ -63,16 +71,22 @@ class Meter extends Model
 	{
 		if (empty(Yii::$app->params['MeterAccauntingPeriodDayOfMonth'])) $dateperiod = 10;		// дата начала расчетного периода каждого месяца 
 		else $dateperiod = Yii::$app->params['MeterAccauntingPeriodDayOfMonth'];
-		$sqltext=  "SELECT ppp.mdatameter_id, ppp.mdatatime, ppp.mdata, ppp.mdatafile, (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) mwho, ppp.mdatafile, ppp.mdatameterstate, ppp.mdatacomment, ppp.id rec_id, ppp.mdatadeltime, ppp.mdatacode
+		$sqltext=  "SELECT ppp.mdatameter_id, ppp.mdatatime, ppp.mdata, ppp.mdatafile, ppp.mdatasource,
+					CASE
+					 WHEN ppp.mdatasource <200 OR ppp.mdatasource is NULL THEN (SELECT concat(e.lastname,' ',e.firstname,' ',e.patronymic) FROM employee e, powermeterdata pm  WHERE pm.mdatawho=e.id AND  pm.id = gg.id ) 
+                     WHEN ppp.mdatasource >=200 AND ppp.mdatasource < 300 THEN 'auto'
+                     WHEN ppp.mdatasource >=300 AND ppp.mdatasource < 400 THEN 'auto'
+                    END as mwho, 
+					ppp.mdatafile, ppp.mdatameterstate, ppp.mdatacomment, ppp.id rec_id, ppp.mdatadeltime, ppp.mdatacode
 					FROM powermeterdata ppp,
 					  (SELECT MAX(pp.id) id 
-      				   FROM (	SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND mdatatime >= :DP AND mdatadeltime IS NULL ) pp, 
+      				   FROM (	SELECT * FROM powermeterdata WHERE mdatacode = '1.8.0' AND mdatatime >= '2018-09-17' AND mdatadeltime IS NULL ) pp, 
 				 			( SELECT MAX(p.mdatatime) t, p.mdatameter_id id
-							  FROM (SELECT * FROM powermeterdata WHERE mdatacode = :OBIS AND mdatatime >= :DP AND  mdatadeltime IS NULL) p 
+							  FROM (SELECT * FROM powermeterdata WHERE mdatacode = '1.8.0' AND mdatatime >= '2018-09-17' AND  mdatadeltime IS NULL) p 
                               GROUP BY p.mdatameter_id
                  			) g 
 					   WHERE pp.mdatameter_id = g.id AND pp.mdatatime = g.t GROUP BY g.id) gg
-					WHERE ppp.id = gg.id AND mdatameter_id = :MID ;" ;
+					WHERE ppp.id = gg.id AND mdatameter_id = 2 ;" ;
 
 		$TS = Yii::$app->formatter->asDatetime( mktime(0, 0, 0, date("m"), $dateperiod, date("Y")) ,'yyyy-MM-dd H:i:s');
 		if (date("d") < $dateperiod)
