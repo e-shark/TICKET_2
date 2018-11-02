@@ -70,6 +70,7 @@ return [
         'meter' => [
             'class' => 'frontend\modules\meter\MeterModule',    
         ],
+        'gridview' => ['class' => 'kartik\grid\Module'],
     ],
     'params' => $params,
 ];

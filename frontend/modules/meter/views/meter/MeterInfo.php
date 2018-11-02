@@ -97,7 +97,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'label' =>Yii::t('meter','Date'),
             //'attribute' => 'mdatatime',
             'content' => function($data){
-            	return "<p data-toggle='tooltip' data-placement='top' title='{$data['employee']}'>{$data['mdatatime']}</p>";
+                if ( !is_null($data["mdatasource"]) && ($data["mdatasource"] > 200) )
+                    $glyph = '<span class="glyphicon glyphicon-font" style="color: Fuchsia; font-size: 70%;"></span>';
+                else
+                    $glyph = '<span class="glyphicon glyphicon-user" style="color: blue; font-size: 70%;"></span>';
+                if (!empty($data['employee']))
+                    $employee = $data['employee'];
+                else
+                    $employee = "неизвестно";
+                $datestr = "<p data-toggle='tooltip' data-placement='top' title='{$employee}'>{$glyph}&nbsp&nbsp&nbsp{$data['mdatatime']}</p>";
+            	return $datestr;
             }
         ],
         [
