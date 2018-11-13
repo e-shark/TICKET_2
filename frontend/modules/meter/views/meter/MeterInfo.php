@@ -111,7 +111,10 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         [
             'label' =>Yii::t('meter','Readings'),
-            'attribute' => 'mdata',
+            //'attribute' => 'mdata',
+            'content' => function($data){
+                return sprintf("%.1f",$data['mdata']/1000.0);   // отображаем в киловатах (а в базе хранится в ваттах)
+            }
         ],
         [
             'label' => Yii::t('meter','State'),

@@ -36,9 +36,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-1"> <?php echo Html::label(Yii::t('meter','Date')." :"); ?> </div>
         <div class="col-md-2 alert alert-info"> <?php echo Html::label( $LastReading['mdatatime']  ); ?> </div>
 
-        <?php //показания ?>
+        <?php //показания (отображаем в киловатах (а в базе хранится в ваттах)) ?>
         <div class="col-md-2"> <?php echo Html::label(Yii::t('meter','Readings')." :"); ?> </div>
-        <div class="col-md-1 alert alert-info"> <?php echo Html::label( $LastReading['mdata']  ); ?> </div>
+        <div class="col-md-1 alert alert-info"> <?php echo Html::label( sprintf("%.1f",$LastReading['mdata']/1000.0)  ); ?> </div>  
 
         <?php //ссылка на фотографию ?>
         <div class="col-md-2"> <?php echo Html::label(Yii::t('meter','Photo')." :"); ?> </div>
@@ -104,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-3">
           <div class="input-group">
             <span class="input-group-addon">Показания</span>
-            <?php echo Html::input('text','MeterData', $LastReading['mdata'], ['id'=>'MeterData','class'=>'form-control']); ?> 
+            <?php echo Html::input('text','MeterData', sprintf("%.1f",$LastReading['mdata']/1000.0), ['id'=>'MeterData','class'=>'form-control']); ?> 
           </div>
         </div>
 

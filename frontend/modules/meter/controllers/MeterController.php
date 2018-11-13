@@ -65,7 +65,7 @@ class MeterController extends Controller
                 $MeterData=date("Y-m-d H:i:s");
             }
             $MeterId = $data['MeterId'];
-            $MeterData = floor( $data['MeterData'] );
+            $MeterData = str_replace(',','.',$data['MeterData']) * 1000.0;          // Ввод в КВаттах. В качестве разделителя можно как точку, так и запятую
             $MeterPhoto = UploadedFile::getInstanceByName('imageFile');
             $RefUrl = $data['RefUrl'];
             if ( (!empty($MeterId)) && (!is_null($MeterData)) ) {

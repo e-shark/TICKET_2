@@ -36,3 +36,7 @@ phpunit.phar
 
 # App file data stor
 /_DataStore/* 
+
+#---  Sublime ide filese
+*.sublime-workspace
+*.sublime-project

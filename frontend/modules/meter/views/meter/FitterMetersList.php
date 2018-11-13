@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
    	<?php   
         $mtrColumns = [
             ['class' => 'yii\grid\SerialColumn'],
-            [
+            [   // Колонка: номер счетчика (и его модель)
                 'label' => Yii::t('meter','Meter'),
                 'content' => function($data){
                     $res = "<a href=".Url::toRoute(['meter/meter-info']).'&MeterId='.$data['id'].' target="_blank">'.$data['meterserialno'].'</a>';
@@ -25,12 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $res;
                 }
             ],
-            [
+            [   // Колонка: Адрес счетчика
                 'label' => Yii::t('meter','Address'),
                 'attribute' => 'addrstr',
             ],
 
-            [
+            [   // Колонка: Показания предидущие
                 'label' => Yii::t('meter','Readings')."<br>".Yii::t('meter','previous'),
                 'encodeLabel' => false,
                 'content' => function($data){
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         $_date = date("Y-m-d",$ts);
                         $_time = date("H:i:s",$ts);
                         $res = '<div style=" display:inline-block">'.$_date.'</div>  ';
-                        $res .= "<div style='float:right; display:inline-block'><b>".$data['C_mdata']."</b></div>";
+                        $res .= "<div style='float:right; display:inline-block'><b>".sprintf("%.1f",$data['C_mdata']/1000.0)."</b></div>";
                         $res .= '<br>';
                         $res .= "<span style='font-weight:normal;font-size:10px;'>".$_time."</span>";
                     }
@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
 
             ],
-            [
+            [   // Колонка: Показания текущие
                 'label' => Yii::t('meter','Readings')."<br>".Yii::t('meter','current'),
                 'encodeLabel' => false,
                 'content' => function($data){
@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         $_date = date("Y-m-d",$ts);
                         $_time = date("H:i:s",$ts);
                         $res .= '<div style=" display:inline-block">'.$_date.'</div>  ';
-                        $res .= "<div style='float:right; display:inline-block'><a href='".Url::toRoute(['meter/enter-reading']).'&MeterId='.$data['id']."'><b>".$data['A_mdata']."</b></a></div>";
+                        $res .= "<div style='float:right; display:inline-block'><a href='".Url::toRoute(['meter/enter-reading']).'&MeterId='.$data['id']."'><b>".sprintf("%.1f",$data['A_mdata']/1000.0)."</b></a></div>";
                         $res .= '<br>';
                         $res .= "<span style='font-weight:normal;font-size:10px;'>".$_time."</span>";
                     }
@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             ],
 
-            [
+            [   // Колонка: Фото
                 'contentOptions' =>function ($model, $key, $index, $column){ return ['style' => 'text-align:  center;']; },
                 'content' => function($data){
                     if (!empty( $data['A_mfile']))
@@ -95,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 */            
 
-            [
+            [   // Колонка: Разница показаний
                 //'label' => "&Delta;",
                 'label' => "<div><span style='text-align: center;'>"."&Delta;"."<span></div>",
                 'headerOptions' =>function ($model, $key, $index, $column){ return ['style' => 'text-align: center']; },
@@ -104,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'contentOptions' =>function ($model, $key, $index, $column){ return ['style' => 'text-align:  center;']; },
                 'content' => function($data){
                     if (!(is_null($data['C_mdata']) || is_null($data['A_mdata']))){
-                        $res = $data['A_mdata'] - $data['C_mdata'];
+                        $res = sprintf( "%.1f", ($data['A_mdata'] - $data['C_mdata'])/1000.0 );
                     }else{ $res = "-"; }
                     return $res;
                 }
