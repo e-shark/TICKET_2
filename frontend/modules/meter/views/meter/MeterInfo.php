@@ -110,7 +110,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         ],
         [
-            'label' =>Yii::t('meter','Readings'),
+            'label' =>Yii::t('meter','Readings').", (".Yii::t('meter','kWh').")",
             //'attribute' => 'mdata',
             'content' => function($data){
                 return sprintf("%.1f",$data['mdata']/1000.0);   // отображаем в киловатах (а в базе хранится в ваттах)
@@ -191,7 +191,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <div class="panel panel-default">
-  <div class="panel-heading"><?php echo Html::label(Yii::t('meter','Input of readings')); ?></div>
+  <div class="panel-heading"><?php echo Html::label(Yii::t('meter','Input of readings')." ,".Yii::t('meter','kWh')); ?></div>
   <div class="panel-body">
 
 

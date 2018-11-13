@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'mdatatime',
             ],
             [
-                'label' => Yii::t('meter','Readings'),
+                'label' => Yii::t('meter','Readings').", (".Yii::t('meter','kWh').")",
                 //'attribute' => 'mdata',
                 'content' => function($data){
                     return "<a href=".Url::toRoute(['meter/enter-reading']).'&MeterId='.$data['id'].(is_null($data['mdata'])?' class="not-set"':'').' >'.(is_null($data['mdata'])?"(не задано)":sprintf("%.1f",$data['mdata']/1000.0)).'</a>'; // отображаем показания в киловатах (а в базе хранится в ваттах)

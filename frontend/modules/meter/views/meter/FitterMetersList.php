@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [   // Колонка: Показания предидущие
-                'label' => Yii::t('meter','Readings')."<br>".Yii::t('meter','previous'),
+                'label' => Yii::t('meter','Readings')."<br>".Yii::t('meter','previous').", (".Yii::t('meter','kWh').")",
                 'encodeLabel' => false,
                 'content' => function($data){
                     if ( is_null($data['C_mtime']) ) {
@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             ],
             [   // Колонка: Показания текущие
-                'label' => Yii::t('meter','Readings')."<br>".Yii::t('meter','current'),
+                'label' => Yii::t('meter','Readings')."<br>".Yii::t('meter','current').", (".Yii::t('meter','kWh').")",
                 'encodeLabel' => false,
                 'content' => function($data){
                     if ( is_null($data['A_mtime']) ) {

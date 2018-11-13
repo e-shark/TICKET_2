@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-2 alert alert-info"> <?php echo Html::label( $LastReading['mdatatime']  ); ?> </div>
 
         <?php //показания (отображаем в киловатах (а в базе хранится в ваттах)) ?>
-        <div class="col-md-2"> <?php echo Html::label(Yii::t('meter','Readings')." :"); ?> </div>
+        <div class="col-md-2"> <?php echo Html::label(Yii::t('meter','Readings').", (".Yii::t('meter','kWh').")"." :"); ?> </div>
         <div class="col-md-1 alert alert-info"> <?php echo Html::label( sprintf("%.1f",$LastReading['mdata']/1000.0)  ); ?> </div>  
 
         <?php //ссылка на фотографию ?>
@@ -70,9 +70,9 @@ $this->params['breadcrumbs'][] = $this->title;
   <div class="panel-heading">
   <?php 
     if ( empty($LastReading['mdatatime']) )
-        echo Html::label(Yii::t('meter','Input of readings')); 
+        echo Html::label(Yii::t('meter','Input of readings')." ,".Yii::t('meter','kWh')); 
     else
-        echo Html::label(Yii::t('meter','Edit of readings')); 
+        echo Html::label(Yii::t('meter','Edit of readings')." ,".Yii::t('meter','kWh')); 
   ?>
   </div>
   <div class="panel-body">

@@ -45,4 +45,6 @@ return[
 'Last readings'  => 'Последние показания',
 'Readings for the period from' => 'Показания за период с',
 'Back' => 'Вернуться',
+'kW' => 'кВт',
+'kWh' => 'кВтч',
 ];
