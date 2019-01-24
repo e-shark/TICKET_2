@@ -109,7 +109,7 @@ class TicketInputController extends Controller
             $data = Yii::$app->request->post();
             if (! empty($data)){
                 $FacilityId =  0 + $data['FacilityId'];
-                $EntranceId = 0 +  $data['EntranceId'];
+                $EntranceId = $data['EntranceId'];
                 $ObjectId = $data['ObjectId'];
                 if ('002'==$ObjectId)
                   $res = json_encode(TicketInputForm::getSwichboardList($FacilityId, $EntranceId));

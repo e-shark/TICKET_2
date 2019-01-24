@@ -132,7 +132,8 @@ class TicketInputForm extends Model
 	//  EntranceId - номер (буква) подъезда
 	public static function getElevatorsList( $FacilityId = 0, $EntranceId=0)
 	{
-		$Elevators =  Yii::$app->db->createCommand('SELECT id, concat(ifnull(elporchpos,"")," ", ifnull(eltype,"")) as text FROM elevator WHERE elfacility_id = '.$FacilityId.' and elporchno = '.$EntranceId.' and eldevicetype = 1;')->queryAll();
+		//Yii::warning("=====================\n".'SELECT id, concat(ifnull(elporchpos,"")," ", ifnull(eltype,"")) as text FROM elevator WHERE elfacility_id = '.$FacilityId." and elporchno = '".$EntranceId."' and eldevicetype = 1;\n");
+		$Elevators =  Yii::$app->db->createCommand('SELECT id, concat(ifnull(elporchpos,"")," ", ifnull(eltype,"")) as text FROM elevator WHERE elfacility_id = '.$FacilityId." and elporchno = '".$EntranceId."' and eldevicetype = 1;")->queryAll();
 		$res['Elevators'] = Html::dropDownList('tiElevator', 'null', ArrayHelper::map($Elevators,'id','text'),['id'=>'tiElevatorSelect','class'=>'form-control','onChange'=>'onSelectElevator()']);
 		$res['ElNum'] = count($Elevators);
 		return $res;
